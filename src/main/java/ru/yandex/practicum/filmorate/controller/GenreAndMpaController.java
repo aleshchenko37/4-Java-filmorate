@@ -21,7 +21,7 @@ public class GenreAndMpaController {
     }
 
     @GetMapping("/genres")
-    public Collection<Genre> getAllGenres(){
+    public Collection<Genre> getAllGenres() {
         log.info("Получен GET-запрос к эндпоинту: '/films/popular?count={count}'");
         return genreAndMpaService.getAllGenres();
     }
@@ -33,7 +33,7 @@ public class GenreAndMpaController {
     }
 
     @GetMapping("/mpa")
-    public Collection<Mpa> getAllMpa(){
+    public Collection<Mpa> getAllMpa() {
         log.info("Получен GET-запрос к эндпоинту: '/mpa'");
         return genreAndMpaService.getAllMpa();
     }

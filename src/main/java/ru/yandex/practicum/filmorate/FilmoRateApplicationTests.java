@@ -19,21 +19,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class FilmoRateApplicationTests {
     private final UserDbStorage userStorage;
-    User user = User.builder()
-            .email("mail@mail.ru")
-            .login("Nick Name")
-            .name("dolore")
-            .birthday(LocalDate.of(1946, 8, 20))
-            .build();
+    User user = User.builder().email("mail@mail.ru").login("Nick Name").name("dolore").birthday(LocalDate.of(1946, 8, 20)).build();
 
     @Test
     public void testCreateUser() {
         Optional<User> userCreated = Optional.of(userStorage.createUser(user));
-        assertThat(userCreated)
-                .isPresent()
-                .hasValueSatisfying(user ->
-                        assertThat(user).hasFieldOrPropertyWithValue("id", 1)
-                );
+        assertThat(userCreated).isPresent().hasValueSatisfying(user -> assertThat(user).hasFieldOrPropertyWithValue("id", 1));
 
         assertThat(userStorage.findAllUsers().size()).isEqualTo(1);
         assertThat(userStorage.findAllUsers()).isEqualTo(List.of(user));
@@ -43,10 +34,6 @@ class FilmoRateApplicationTests {
     public void testFindUserById() {
         Optional<User> userOptional = userStorage.findUserById(1);
 
-        assertThat(userOptional)
-                .isPresent()
-                .hasValueSatisfying(user ->
-                        assertThat(user).hasFieldOrPropertyWithValue("id", 1)
-                );
+        assertThat(userOptional).isPresent().hasValueSatisfying(user -> assertThat(user).hasFieldOrPropertyWithValue("id", 1));
     }
 }

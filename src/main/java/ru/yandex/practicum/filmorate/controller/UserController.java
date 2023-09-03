@@ -20,7 +20,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public Optional<User> getUserById(@PathVariable int id){
+    public Optional<User> getUserById(@PathVariable int id) {
         log.info("Получен GET-запрос к эндпоинту: '/users/{id}'");
         return userService.findUserById(id);
     }

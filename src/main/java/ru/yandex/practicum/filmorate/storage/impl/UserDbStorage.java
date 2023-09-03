@@ -22,19 +22,15 @@ import java.util.Optional;
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    public UserDbStorage(JdbcTemplate jdbcTemplate){
-        this.jdbcTemplate=jdbcTemplate;
+    public UserDbStorage(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public Optional<User> findUserById(int id) {
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from users where user_id = ?", id);
-        if(userRows.next()) {
-            User user = new User(userRows.getInt("user_id"),
-                    userRows.getString("email"),
-                    userRows.getString("login"),
-                    userRows.getString("name"),
-                    userRows.getDate("birthday").toLocalDate());
+        if (userRows.next()) {
+            User user = new User(userRows.getInt("user_id"), userRows.getString("email"), userRows.getString("login"), userRows.getString("name"), userRows.getDate("birthday").toLocalDate());
             log.info("Найден пользователь: {} {}", user.getId(), user.getLogin());
             return Optional.of(user);
         } else {
@@ -70,9 +66,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User createUser(User user) {
-        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("users")
-                .usingGeneratedKeyColumns("user_id");
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("users").usingGeneratedKeyColumns("user_id");
         user.setId(simpleJdbcInsert.executeAndReturnKey(user.toMap()).intValue());
         log.info("Создан пользователь: {} {}", user.getId(), user.getLogin());
         return user;
@@ -81,12 +75,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User updateUser(User user) {
         String sql = "update users set email = ?, login = ?, name = ?, birthday = ? where user_id = ?";
-        jdbcTemplate.update(sql,
-                user.getEmail(),
-                user.getLogin(),
-                user.getName(),
-                user.getBirthday(),
-                user.getId());
+        jdbcTemplate.update(sql, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
         log.info("Пользователь с id: {} обновлен", user.getId());
         return user;
     }
@@ -96,9 +85,7 @@ public class UserDbStorage implements UserStorage {
         String sqlCheck = "select * from user_friend where user_id = ? and friend_id = ? or friend_id = ? and user_id = ?";
         // запрос на получение всех записей, в которых есть id и первого пользователя, и второго
         log.info("Проверка запросов на дружбу пользователей с id: {} и {}", id, friendId);
-        Collection<Friends> friends = jdbcTemplate.query(sqlCheck, (rs, rowNum) -> new Friends(
-                rs.getInt("user_id"),
-                rs.getInt("friend_id")), id, friendId, id, friendId);
+        Collection<Friends> friends = jdbcTemplate.query(sqlCheck, (rs, rowNum) -> new Friends(rs.getInt("user_id"), rs.getInt("friend_id")), id, friendId, id, friendId);
         if (friends.isEmpty()) {
             // если ни одной пары не найдено, добавляем запись
             String sql = "insert into user_friend (user_id, friend_id) values (?, ?)";
@@ -120,15 +107,13 @@ public class UserDbStorage implements UserStorage {
             }
         }
     }
-    
+
     @Override
     public void removeFriend(int id, int friendId) {
         String sqlCheck = "select * from user_friend where user_id = ? and friend_id = ? or friend_id = ? and user_id = ?";
         // запрос на получение всех записей, в которых есть id и первого пользователя, и второго
         log.info("Проверка запросов на дружбу пользователей с id: {} и {}", id, friendId);
-        Collection<Friends> friends = jdbcTemplate.query(sqlCheck, (rs, rowNum) -> new Friends(
-                rs.getInt("user_id"),
-                rs.getInt("friend_id")), id, friendId, id, friendId);
+        Collection<Friends> friends = jdbcTemplate.query(sqlCheck, (rs, rowNum) -> new Friends(rs.getInt("user_id"), rs.getInt("friend_id")), id, friendId, id, friendId);
         if (friends.isEmpty()) {
             throw new ValidateException("Вы не отправляли пользователю запрос на дружбу");
         } else if (friends.size() == 2) {

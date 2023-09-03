@@ -8,7 +8,10 @@ import java.util.Optional;
 
 public interface GenreAndMpaStorage {
     Collection<Genre> findAllGenres();
+
     Optional<Genre> findGenreById(int id);
+
     Collection<Mpa> getAllMpa();
+
     Optional<Mpa> findMpaById(int id);
 }

@@ -10,7 +10,10 @@ import java.lang.annotation.RetentionPolicy;
 @Past
 public @interface AfterDate {
     String message() default "Дата не должна быть ранее {value}";
+
     Class<?>[] groups() default {};
+
     Class<?>[] payload() default {};
+
     String value = "1895-12-28";
 }

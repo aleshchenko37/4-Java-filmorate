@@ -25,23 +25,15 @@ import java.util.Set;
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    public FilmDbStorage(JdbcTemplate jdbcTemplate){
-        this.jdbcTemplate=jdbcTemplate;
+    public FilmDbStorage(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public Optional<Film> findFilmById(int id) {
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from film where film_id = ?", id);
-        if(filmRows.next()) {
-            Film film = new Film(filmRows.getInt("film_id"),
-                    filmRows.getString("name"),
-                    filmRows.getString("description"),
-                    filmRows.getDate("release_date").toLocalDate(),
-                    filmRows.getInt("duration"),
-                    getRate(id),
-                    getMpa(id),
-                    getGenres(id)
-            );
+        if (filmRows.next()) {
+            Film film = new Film(filmRows.getInt("film_id"), filmRows.getString("name"), filmRows.getString("description"), filmRows.getDate("release_date").toLocalDate(), filmRows.getInt("duration"), getRate(id), getMpa(id), getGenres(id));
             log.info("Найден фильм: {} {}", film.getId(), film.getName());
             return Optional.of(film);
         } else {
@@ -51,32 +43,26 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public  Collection<Film> findAllFilms() {
+    public Collection<Film> findAllFilms() {
         String sql = "select * from film";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs));
     }
 
     @Override
-    public Film createFilm (Film film) {
-        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("film")
-                .usingGeneratedKeyColumns("film_id");
+    public Film createFilm(Film film) {
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("film").usingGeneratedKeyColumns("film_id");
         // тот же фильм, но с id. mpa и жанры пока не добавлены
         film.setId(simpleJdbcInsert.executeAndReturnKey(film.toMap()).intValue());
 
         if (film.getMpa() != null) {
             String sqlQuery = "insert into film_rating(film_id, rating_id) values (?, ?)";
-            jdbcTemplate.update(sqlQuery,
-                    film.getId(),
-                    film.getMpa().getId());
+            jdbcTemplate.update(sqlQuery, film.getId(), film.getMpa().getId());
         }
 
         if (film.getGenres() != null) {
             for (Integer genreId : getUniqueGenres(film.getGenres())) {
                 String genreQuery = "insert into film_genre(film_id, genre_id) values (?, ?)";
-                jdbcTemplate.update(genreQuery,
-                        film.getId(),
-                        genreId);
+                jdbcTemplate.update(genreQuery, film.getId(), genreId);
             }
         }
         //возвращаем исходный объект присвоенным id, рейтинг сохранен, жанры сохранены
@@ -86,12 +72,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film updateFilm(Film film) {
         String sql = "update film set name = ?, description = ?, release_date = ?, duration = ? where film_id = ?";
-        jdbcTemplate.update(sql,
-                film.getName(),
-                film.getDescription(),
-                film.getReleaseDate(),
-                film.getDuration(),
-                film.getId());
+        jdbcTemplate.update(sql, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getId());
         if (film.getRate() != 0) {
             // если в фильме передан рейтинг, сохраняем его, если нет - рассчитываем
             String sqlRate = "update film set rate = ? where film_id = ?";
@@ -121,13 +102,11 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public void addLike(int filmId, int userId) {
         SqlRowSet checkRows = jdbcTemplate.queryForRowSet("select * from film_user where film_id = ? and user_id = ?", filmId, userId);
-        if(checkRows.next()) {
+        if (checkRows.next()) {
             throw new ValidateException("Вы уже поставили лайк этому фильму");
         } else {
             String sqlQuery = "insert into film_user(film_id, user_id) values (?, ?)";
-            jdbcTemplate.update(sqlQuery,
-                    filmId,
-                    userId);
+            jdbcTemplate.update(sqlQuery, filmId, userId);
             // обновляем рейтинг в таблице film
             String sqlRating = "update film set rate = ? where film_id = ?";
             jdbcTemplate.update(sqlRating, getRate(filmId), filmId);
@@ -139,7 +118,7 @@ public class FilmDbStorage implements FilmStorage {
     public void removeLike(int filmId, int userId) {
         SqlRowSet checkRows = jdbcTemplate.queryForRowSet("select * from film_user where film_id = ? and user_id = ?", filmId, userId);
         log.info("Проверка поставленных лайков пользователя с id: {} фильму с id {}", userId, filmId);
-        if(checkRows.next()) {
+        if (checkRows.next()) {
             String sql = "delete from film_user where film_id = ? and user_id = ?";
             jdbcTemplate.update(sql, filmId, userId);
             // обновляем рейтинг в таблице film
@@ -171,7 +150,7 @@ public class FilmDbStorage implements FilmStorage {
     private Mpa getMpa(int filmId) {
         Mpa mpa = new Mpa();
         SqlRowSet mpaRows = jdbcTemplate.queryForRowSet("select fr.rating_id, r.name from film_rating as fr inner join rating as r on fr.rating_id = r.rating_id where film_id = ?", filmId);
-        if(mpaRows.next()) {
+        if (mpaRows.next()) {
             mpa.setId(mpaRows.getInt("rating_id"));
             mpa.setName(mpaRows.getString("name"));
         }
@@ -186,11 +165,12 @@ public class FilmDbStorage implements FilmStorage {
     private int getRate(int filmId) {
         int rate = 0;
         SqlRowSet rateRows = jdbcTemplate.queryForRowSet("select count(user_id) as count from film_user where film_id = ?", filmId);
-        if(rateRows.next()) {
+        if (rateRows.next()) {
             rate = rateRows.getInt("count");
         }
         return rate;
     }
+
     private Collection<Integer> getUniqueGenres(Collection<Genre> genres) {
         Set<Integer> uniqueGenresIds = new HashSet<>();
         for (Genre genre : genres) {

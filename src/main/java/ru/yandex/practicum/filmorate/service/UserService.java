@@ -39,6 +39,7 @@ public class UserService {
         findUserById(id);
         userStorage.removeUser(id);
     }
+
     public User createUser(User user) {
         return userStorage.createUser(user);
     }
