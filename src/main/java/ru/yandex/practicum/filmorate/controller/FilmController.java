@@ -20,7 +20,7 @@ public class FilmController {
     }
 
     @GetMapping("/{id}")
-    public Optional<Film> getFilmById(@PathVariable int id){
+    public Optional<Film> getFilmById(@PathVariable int id) {
         log.info("Получен GET-запрос к эндпоинту: '/films/{id}'");
         return filmService.findFilmById(id);
     }
