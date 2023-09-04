@@ -45,4 +45,17 @@ public class User {
         values.put("birthday", birthday);
         return values;
     }
+
+@Data
+@Builder
+public class User extends Entity {
+    @NonNull
+    @Email
+    private final String email;
+    @NonNull
+    @Pattern(regexp = "\\S*$")    // не должно быть пробелов
+    private final String login;
+    private String name;
+    @Past
+    private final LocalDate birthday;
 }
