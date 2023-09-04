@@ -179,7 +179,7 @@ public class FilmDbStorage implements FilmStorage {
                     public int getBatchSize() {
                         return getUniqueGenres(film.getGenres()).size();
                     }
-                } );
+                });
         return updateCounts;
     }
 }
