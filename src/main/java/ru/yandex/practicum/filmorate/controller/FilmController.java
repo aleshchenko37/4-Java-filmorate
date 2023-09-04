@@ -56,8 +56,8 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<Film> getListOfPopularFilms(@RequestParam(defaultValue = "10") String count) {
-        log.info("Получен GET-запрос к эндпоинту: '/films/popular?count={count}'");
-        return filmService.getListOfPopularFilms(count);
+    public Collection<Film> getListOfPopularFilms(@RequestParam(defaultValue = "10") String someCount) {
+        log.info("Получен GET-запрос к эндпоинту: '/films/popular?count={someCount}'");
+        return filmService.getListOfPopularFilms(someCount);
     }
 }
