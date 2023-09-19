@@ -6,7 +6,5 @@ Template repository for Filmorate project.
 2. Хранить данные о пользователях и выдавать их по запросу.
 3. Добавлять пользователей в друзья.
 4. Лайкать фильмы.
-
-Приложение написано на Java.
-
-https://github.com/aleshchenko37/java-filmorate/blob/main/diagram.png
+---
+Приложение написано на Java. Целью проекта является создание API в соответствии с принципами REST и использование встроенной базы данных(H2). В основе проекта лежит фреймворк Spring Boot, подключена библиотека Lombok, для валидации данных используется Jakarta Bean Validation (а также собственный валидатор). Приложение хранит данные в базе данных, структура описана на диаграмме https://github.com/aleshchenko37/java-filmorate/blob/main/diagram.png (создана в QuickDBD).
