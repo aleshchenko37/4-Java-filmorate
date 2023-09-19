@@ -1,4 +1,4 @@
-# Это репозиторий проекта java-filmorate
+# Это репозиторий проекта Java-filmorate
 Template repository for Filmorate project.
 ---
 Приложение **умеет**:
